@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ricefully Yours</title>
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
+<meta name="theme-color" content="#E8A317">
+<style>
+:root{--cream:#FFF4DC;--rice:#FFFCF5;--gold:#E8A317;--brown:#6B4A2B;--ink:#3A2814;--line:#EBDDBF;--ok:#4F7F35;--bad:#B23B2B}
+*{box-sizing:border-box}
+body{margin:0;font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif;background:var(--cream);color:var(--ink)}
+header{position:fixed;top:0;left:0;right:0;height:56px;background:var(--rice);border-bottom:3px solid var(--gold);display:flex;align-items:baseline;gap:10px;padding:10px 14px;z-index:5}
+header b{font-size:19px;color:var(--brown)}header small{color:#8a6c49}
+#nav{position:fixed;z-index:5;background:var(--rice);display:flex;bottom:0;left:0;right:0;overflow-x:auto;border-top:1px solid var(--line)}
+#nav a{flex:0 0 auto;min-width:70px;text-align:center;padding:6px 4px;font-size:11px;color:var(--brown);text-decoration:none}
+#nav a span{display:block;font-size:20px}
+#nav a.on{background:var(--gold);color:var(--ink);font-weight:700}
+main{padding:72px 14px 92px;max-width:1000px}
+h2{margin:6px 0 12px;color:var(--brown)}h3,h4{margin:10px 0 6px;color:var(--brown)}
+@media(min-width:800px){#nav{top:56px;bottom:0;right:auto;width:190px;flex-direction:column;border-top:0;border-right:1px solid var(--line)}#nav a{text-align:left;padding:13px 16px;font-size:15px;display:flex;gap:10px;align-items:center}#nav a span{display:inline;font-size:18px}main{margin-left:190px;padding-bottom:30px}}
+.card{background:var(--rice);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
+.card.warn{background:#FFE9B8;border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
+.stat small{color:#8a6c49}.stat b{display:block;font-size:20px}
+.btn{min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--brown);background:var(--rice);color:var(--brown);font:inherit;font-weight:700;cursor:pointer;margin:2px 0}
+.btn.pri{background:var(--gold);border-color:var(--gold);color:var(--ink)}.btn.del{color:var(--bad);border-color:var(--bad)}
+.btn:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--brown);outline-offset:1px}
+.tw{overflow-x:auto;margin:8px 0}table{border-collapse:collapse;width:100%;font-size:14px;background:var(--rice)}
+th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#F6E6BE;color:var(--brown);white-space:nowrap}
+label{display:block;margin:9px 0;font-size:14px;color:var(--brown)}
+input,select,textarea{width:100%;padding:11px;font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:3px}
+.rr{display:grid;grid-template-columns:1fr 72px 78px 44px;gap:4px;margin:4px 0}.rr *{margin:0}
+.b{padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700}.ok{background:#DDEBC9;color:var(--ok)}.warn.b{background:#FFE08A}.bad{background:#F6D3CC;color:var(--bad)}
+.sp{display:flex;justify-content:space-between;gap:8px}.row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.muted{color:#8a6c49}.err{color:var(--bad);font-weight:700}
+.void td{text-decoration:line-through;color:#9a8a77}
+dialog{border:0;border-radius:14px;max-width:540px;width:94%;background:var(--rice);color:var(--ink);padding:18px;max-height:92vh}dialog::backdrop{background:#3a281488}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--brown);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90%}
+#toast.show{opacity:1}#toast.bad{background:var(--bad)}
+ul{padding-left:18px;margin:4px 0}
+</style></head><body>
+<header><b>🍚 Ricefully Yours</b><small>Silog Meals on the Go</small></header>
+<nav id="nav"></nav><main id="app"></main><dialog id="dlg"></dialog><div id="toast"></div>
+<script>
+const KEY='ricefully_v1',$=s=>document.querySelector(s),dlg=$('#dlg');
+const U={kg:['w',1000],g:['w',1],L:['v',1000],mL:['v',1],pcs:['c',1],dozen:['c',12]};
+const N=[['home','🏠','Home'],['ingredients','🥚','Ingredients'],['stock','📦','Stock'],['products','🍳','Products'],['sales','🧾','Sales'],['expenses','💸','Expenses'],['finance','📈','Profit'],['calculator','🧮','Calculator'],['reports','📋','Reports'],['data','💾','Backup']];
+const empty=()=>({ing:[],bat:[],txn:[],prod:[],sale:[],exp:[],lastBackup:null});
+let D,S={per:'day',rep:'inv'},C=[],RR=[],IP=null;
+function load(){try{D=Object.assign(empty(),JSON.parse(localStorage.getItem(KEY)))}catch(e){D=empty()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D))}catch(e){toast('Could not save: browser storage is full.',1)}}
+const id=p=>p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const r=n=>+(+n).toFixed(2),num=v=>{v=parseFloat(v);return isFinite(v)?v:NaN},sum=(a,f)=>a.reduce((s,x)=>s+f(x),0);
+const money=n=>'₱'+(+n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2});
+const money4=n=>'₱'+(+n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:4});
+const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
+function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',3200)}
+const tbl=(h,rows,e='Nothing here yet.')=>rows.length?`<div class=tw><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(x=>`<tr${x.cls?` class=${x.cls}`:''}>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`:`<p class=muted>${e}</p>`;
+
+/* ---- core calculations ---- */
+const ingBy=i=>D.ing.find(x=>x.id===i);
+const unitsFor=g=>g.type==='w'?['kg','g']:g.type==='v'?['L','mL']:g.base==='pcs'?['pcs','dozen']:[g.base];
+const unitsOf=g=>g.ppb&&g.type!=='c'?['pcs',...unitsFor(g)]:unitsFor(g);
+function toBase(g,q,u){if(u==='pcs'&&g.type!=='c')return g.ppb?q/g.ppb:NaN;const x=U[u];if(x)return x[0]===g.type?q*x[1]:NaN;return u===g.base?q:NaN}
+const bl=g=>g.type==='w'?'g':g.type==='v'?'mL':g.base;
+function cpb(g){const b=D.bat.filter(b=>b.ing===g.id).sort((a,b)=>a.date<b.date?-1:a.date>b.date?1:0).pop();return b?b.price/b.qty:0}
+const stock=g=>Math.round(sum(D.txn.filter(t=>t.ing===g.id),t=>t.q)*1e6)/1e6;
+function fq(g,b){const a=Math.abs(b);let s=g.type==='w'?(a>=1000?r(b/1000)+' kg':r(b)+' g'):g.type==='v'?(a>=1000?r(b/1000)+' L':r(b)+' mL'):r(b)+' '+g.base;if(g.ppb&&g.type!=='c')s+=` (~${r(b*g.ppb)} pcs)`;return s}
+function costTxt(g){const c=cpb(g);if(!c)return'—';const a=g.type==='w'?[['kg',c*1000],['g',c]]:g.type==='v'?[['L',c*1000],['mL',c]]:[[g.base,c]];if(g.ppb&&g.type!=='c')a.push(['piece',c/g.ppb]);return a.map(([u,v])=>money4(v)+'/'+u).join('<br>')}
+const ic=it=>{const g=ingBy(it.ing);if(!g)return 0;const b=toBase(g,+it.q,it.u);return isNaN(b)?0:b*cpb(g)};
+const prodCost=p=>sum(p.items,ic);
+const act=()=>D.sale.filter(s=>!s.void),rev=s=>s.qty*s.price,cogs=s=>s.qty*s.cost;
+const tot=()=>{const A=act(),R=sum(A,rev),K=sum(A,cogs),E=sum(D.exp,e=>e.amt),P=sum(D.bat,b=>b.price);return{R,K,E,P,G:R-K,N:R-K-E}};
+function pk(d,p){if(p==='day')return d;if(p==='month')return d.slice(0,7);const t=new Date(d+'T00:00');t.setDate(t.getDate()-(t.getDay()+6)%7);return'Week of '+t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0')}
+function finRows(){const m={},g=k=>m[k]??={R:0,K:0,E:0,P:0};act().forEach(s=>{const x=g(pk(s.date,S.per));x.R+=rev(s);x.K+=cogs(s)});D.exp.forEach(e=>g(pk(e.date,S.per)).E+=e.amt);D.bat.forEach(b=>g(pk(b.date,S.per)).P+=b.price);return Object.keys(m).sort().reverse().map(k=>{const x=m[k];return[k,x.R,x.P,x.K,x.R-x.K,x.E,x.R-x.K-x.E]})}
+const perSel=()=>`<select onchange="S.per=this.value;render()" aria-label="Summary period">${[['day','Daily'],['week','Weekly'],['month','Monthly']].map(([v,l])=>`<option value=${v}${S.per===v?' selected':''}>${l}</option>`).join('')}</select>`;
+
+/* ---- generic dialogs ---- */
+const op=o=>Array.isArray(o)?o:[o,o];
+function form(title,fs,cb,extra=''){
+ dlg.innerHTML=`<h3>${title}</h3><div>${fs.map(f=>`<label>${f.l}${f.t==='select'?`<select id=f_${f.k}>${f.o.map(o=>{const[v,l]=op(o);return`<option value="${esc(v)}"${v==f.v?' selected':''}>${esc(l)}</option>`}).join('')}</select>`:f.t==='area'?`<textarea id=f_${f.k}>${esc(f.v)}</textarea>`:`<input id=f_${f.k} type=${f.t||'text'}${f.t==='number'?' step=any min=0 inputmode=decimal':''} value="${esc(f.v)}">`}</label>`).join('')}${extra}</div><p id=err class=err></p><div class=row><button class=btn onclick="dlg.close()">Cancel</button><button class="btn pri" id=okb>Save</button></div>`;
+ $('#okb').onclick=()=>{const v={};fs.forEach(f=>v[f.k]=$('#f_'+f.k).value.trim());const e=cb(v);if(e)$('#err').textContent=e;else dlg.close()};
+ dlg.showModal()}
+function info(t,h){dlg.innerHTML=`<h3>${t}</h3>${h}<div class=row><button class="btn pri" onclick="dlg.close()">Close</button></div>`;dlg.showModal()}
+
+/* ---- ingredients ---- */
+function vIngredients(){return`<h2>Ingredients</h2><button class="btn pri" onclick="ingForm()">+ Add ingredient</button>`+tbl(['Ingredient','Cost','Remaining','Actions'],D.ing.map(g=>[`<b>${esc(g.name)}</b><br><small>${esc(g.cat)}${g.sup?' · '+esc(g.sup):''}</small>`,costTxt(g),fq(g,stock(g)),`<button class=btn onclick="ingView('${g.id}')">View</button> <button class=btn onclick="ingForm('${g.id}')">Edit</button> <button class="btn del" onclick="ingDel('${g.id}')">Delete</button>`]),'No ingredients yet. Tap “Add ingredient” to start.')}
+function ingForm(i){const g=i?ingBy(i):null;
+ const fs=[{k:'name',l:'Ingredient name',v:g?.name},{k:'cat',l:'Category',t:'select',o:['Meat & protein','Rice & grains','Egg & dairy','Vegetables','Oil & condiments','Packaging','Other'],v:g?.cat},{k:'sup',l:'Supplier (optional)',v:g?.sup}];
+ if(!g)fs.push({k:'unit',l:'Measurement unit',t:'select',o:['kg','g','L','mL','pcs','dozen','pack','bottle','other'],v:'kg'},{k:'cu',l:'Custom unit name (only if you pick “other”)'},{k:'price',l:'Purchase price (₱)',t:'number'},{k:'qty',l:'Purchase quantity (in the unit above)',t:'number'},{k:'pcs',l:'Number of pieces in this purchase (optional, e.g. 20 hotdogs in 1 kg)',t:'number'},{k:'date',l:'Purchase date',t:'date',v:today()});
+ fs.push({k:'min',l:g?`Minimum stock (in ${bl(g)})`:'Minimum stock (in the unit above)',t:'number',v:g?r(g.min):0});
+ form(g?'Edit ingredient':'Add ingredient',fs,v=>{
+  if(!v.name)return'Enter the ingredient name.';
+  const mn=v.min===''?0:num(v.min);if(!(mn>=0))return'Minimum stock must be 0 or more.';
+  if(D.ing.some(x=>x.id!==i&&x.name.toLowerCase()===v.name.toLowerCase()))return'This ingredient already exists.';
+  if(g){Object.assign(g,{name:v.name,cat:v.cat,sup:v.sup,min:mn});save();render();return}
+  const price=num(v.price),qty=num(v.qty);if(!(price>=0)||!(qty>0))return'Enter a purchase price and a quantity above 0.';
+  let u=v.unit;if(u==='other'){u=v.cu;if(!u)return'Type a custom unit name.'}
+  const x=U[u],type=x?x[0]:'c',f=x?x[1]:1,qb=qty*f,pcs=num(v.pcs),d=v.date||today();
+  const n={id:id('i'),name:v.name,cat:v.cat,sup:v.sup,type,base:type==='w'?'g':type==='v'?'mL':(x?'pcs':u),min:mn*f,ppb:type!=='c'&&pcs>0?pcs/qb:null};
+  D.ing.push(n);D.bat.push({id:id('b'),ing:n.id,date:d,price,qty:qb,pcs:pcs>0?pcs:null});D.txn.push({id:id('t'),ing:n.id,q:qb,date:d,type:'purchase',note:'First purchase'});save();render()})}
+function ingView(i){const g=ingBy(i);info(esc(g.name),`<p>Remaining: <b>${fq(g,stock(g))}</b><br>Minimum: ${fq(g,g.min)}</p><p><b>Latest cost</b><br>${costTxt(g)}</p><h4>Purchase batches</h4>`+tbl(['Date','Price','Quantity','Unit cost'],D.bat.filter(b=>b.ing===i).reverse().map(b=>[b.date,money(b.price),fq(g,b.qty),money4(b.price/b.qty)+'/'+bl(g)])))}
+function ingDel(i){const g=ingBy(i),u=D.prod.filter(p=>p.items.some(x=>x.ing===i));if(u.length)return toast('Used in: '+u.map(p=>p.name).join(', ')+'. Remove it from the recipe first.',1);if(!confirm('Delete '+g.name+'? Its purchase and stock history will also be removed.'))return;D.ing=D.ing.filter(x=>x.id!==i);D.bat=D.bat.filter(x=>x.ing!==i);D.txn=D.txn.filter(x=>x.ing!==i);save();render()}
+
+/* ---- stock ---- */
+function vStock(){const rows=D.ing.map(g=>{const s=stock(g);return[esc(g.name),fq(g,s),s<=0?'<span class="b bad">Out of stock</span>':s<=g.min?'<span class="b warn">Low</span>':'<span class="b ok">OK</span>',fq(g,g.min),`<button class="btn pri" onclick="buyForm('${g.id}')">+ Stock</button> <button class=btn onclick="useForm('${g.id}')">Use</button> <button class=btn onclick="adjForm('${g.id}')">Fix qty</button>`]});
+ const h=D.txn.slice().reverse().slice(0,100).map(t=>{const g=ingBy(t.ing);return[t.date,esc(g?g.name:'(deleted)'),t.type,(t.q>0?'+':'')+(g?fq(g,t.q):t.q),esc(t.note||'')]});
+ return`<h2>Stock</h2><p class=muted>Add purchases, record usage, and watch low stock.</p>`+tbl(['Ingredient','Remaining','Status','Minimum','Actions'],rows,'Add ingredients first.')+'<h3>Recent stock history</h3>'+tbl(['Date','Ingredient','Type','Change','Note'],h)}
+function buyForm(i){const g=ingBy(i),fs=[{k:'price',l:'Purchase price (₱)',t:'number'},{k:'qty',l:'Quantity bought',t:'number'},{k:'unit',l:'Unit',t:'select',o:unitsFor(g)}];
+ if(g.type!=='c')fs.push({k:'pcs',l:'Number of pieces (optional)',t:'number'});fs.push({k:'date',l:'Date',t:'date',v:today()});
+ form('Add stock: '+esc(g.name),fs,v=>{const price=num(v.price),q=num(v.qty);if(!(price>=0)||!(q>0))return'Enter a price and a quantity above 0.';
+  const b=toBase(g,q,v.unit),pcs=num(v.pcs),d=v.date||today();if(pcs>0&&g.type!=='c')g.ppb=pcs/b;
+  D.bat.push({id:id('b'),ing:g.id,date:d,price,qty:b,pcs:pcs>0?pcs:null});D.txn.push({id:id('t'),ing:g.id,q:b,date:d,type:'purchase',note:'Stock purchase'});save();render()})}
+function useForm(i){const g=ingBy(i);form('Use stock: '+esc(g.name),[{k:'qty',l:'Quantity used',t:'number'},{k:'unit',l:'Unit',t:'select',o:unitsOf(g)},{k:'date',l:'Date',t:'date',v:today()},{k:'note',l:'Note (optional)'}],v=>{
+  const q=num(v.qty);if(!(q>0))return'Enter a quantity above 0.';const b=toBase(g,q,v.unit),s=stock(g);
+  if(b>s+1e-9&&!confirm(`You only have ${fq(g,Math.max(s,0))}. Use all that is available?`))return'Cancelled: not enough stock.';
+  const d=Math.min(b,Math.max(s,0));if(d<=0)return'There is no stock to use.';
+  D.txn.push({id:id('t'),ing:g.id,q:-d,date:v.date||today(),type:'use',note:v.note});save();render()})}
+function adjForm(i){const g=ingBy(i);form('Fix quantity: '+esc(g.name),[{k:'qty',l:'Actual quantity remaining',t:'number',v:''},{k:'unit',l:'Unit',t:'select',o:unitsOf(g)}],v=>{
+  const q=num(v.qty);if(!(q>=0))return'Enter the quantity you really have (0 or more).';const diff=toBase(g,q,v.unit)-stock(g);
+  if(Math.abs(diff)>1e-9)D.txn.push({id:id('t'),ing:g.id,q:diff,date:today(),type:'adjust',note:'Quantity corrected'});save();render()})}
+
+/* ---- products ---- */
+function rrDraw(){RR.forEach(x=>{const g=ingBy(x.ing)||D.ing[0];x.ing=g.id;if(!unitsOf(g).includes(x.u))x.u=unitsOf(g)[0]});
+ $('#rr').innerHTML=RR.map((x,i)=>{const g=ingBy(x.ing);return`<div class=rr><select onchange="RR[${i}].ing=this.value;rrDraw()">${D.ing.map(y=>`<option value="${y.id}"${y.id===x.ing?' selected':''}>${esc(y.name)}</option>`).join('')}</select><input type=number step=any min=0 placeholder=Qty value="${esc(x.q)}" oninput="RR[${i}].q=this.value"><select onchange="RR[${i}].u=this.value">${unitsOf(g).map(u=>`<option${u===x.u?' selected':''}>${u}</option>`).join('')}</select><button class=btn onclick="RR.splice(${i},1);rrDraw()" aria-label="Remove">✕</button></div>`}).join('')}
+const addRR=()=>{RR.push({ing:D.ing[0].id,q:'',u:''});rrDraw()};
+function prodForm(i){const p=i?D.prod.find(x=>x.id===i):null;if(!D.ing.length)return toast('Add ingredients first.',1);
+ RR=p?p.items.map(x=>({...x})):[{ing:D.ing[0].id,q:'',u:''}];
+ form(p?'Edit product':'Add product',[{k:'name',l:'Product name',v:p?.name},{k:'desc',l:'Description (optional)',v:p?.desc},{k:'price',l:'Selling price (₱)',t:'number',v:p?.price},{k:'sv',l:'Servings this recipe makes',t:'number',v:p?.sv||1}],v=>{
+  const price=num(v.price),sv=v.sv===''?1:num(v.sv);if(!v.name)return'Enter the product name.';if(!(price>=0))return'Enter a selling price.';if(!(sv>0))return'Servings must be above 0.';
+  const items=RR.filter(x=>num(x.q)>0).map(x=>({ing:x.ing,q:num(x.q),u:x.u}));if(!items.length)return'Add at least one ingredient with a quantity.';
+  if(items.some(x=>isNaN(toBase(ingBy(x.ing),x.q,x.u))))return'One ingredient has a unit that cannot be converted.';
+  if(p)Object.assign(p,{name:v.name,desc:v.desc,price,sv,items});else D.prod.push({id:id('p'),name:v.name,desc:v.desc,price,sv,items});save();render()},
+  '<h4>Recipe (quantity per serving)</h4><div id=rr></div><button class=btn onclick="addRR()">+ Add ingredient</button>');rrDraw()}
+function vProducts(){return`<h2>Products</h2><button class="btn pri" onclick="prodForm()">+ Add product</button>`+(D.prod.length?D.prod.map(p=>{const c=prodCost(p),gp=p.price-c;return`<div class=card><div class=sp><b>${esc(p.name)}</b><b>${money(p.price)}</b></div><small>${esc(p.desc||'')}</small>`+tbl(['Ingredient','Per serving','Cost'],p.items.map(it=>{const g=ingBy(it.ing);return[g?esc(g.name):'(deleted)',it.q+' '+it.u,money(ic(it))]}))+`<p>Cost per serving: <b>${money(c)}</b> · Profit: <b>${money(gp)}</b> · Margin: <b>${p.price?r(gp/p.price*100):0}%</b><br><small>Recipe makes ${p.sv} serving(s). Total production cost: ${money(c*p.sv)}</small></p><button class=btn onclick="prodForm('${p.id}')">Edit</button> <button class="btn del" onclick="prodDel('${p.id}')">Delete</button></div>`}).join(''):'<p class=muted>No products yet. Add your first silog meal.</p>')}
+function prodDel(i){if(!confirm('Delete this product? Past sales are kept.'))return;D.prod=D.prod.filter(p=>p.id!==i);save();render()}
+
+/* ---- sales ---- */
+function vSales(){const h=D.sale.slice().reverse().map(s=>{const x=[s.date,esc(s.name),s.qty,money(rev(s)),money(cogs(s)),money(rev(s)-cogs(s)),s.void?'Reversed':`<button class="btn del" onclick="voidSale('${s.id}')">Reverse</button>`];if(s.void)x.cls='void';return x});
+ return`<h2>Sales</h2><div class=card><h3>Record a sale</h3>${D.prod.length?`<label>Product<select id=sp onchange="spCh()">${D.prod.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label><label>Servings sold<input id=sq type=number min=1 step=1 value=1></label><label>Selling price each (₱)<input id=spr type=number step=any min=0></label><label>Date<input id=sd type=date value="${today()}"></label><button class="btn pri" onclick="doSale()">Record sale</button>`:'<p class=muted>Add a product first.</p>'}</div><h3>Sales history</h3>`+tbl(['Date','Product','Qty','Sales','Cost','Profit',''],h)}
+const spCh=()=>{const p=D.prod.find(x=>x.id===$('#sp').value);$('#spr').value=p?p.price:''};
+function doSale(){const p=D.prod.find(x=>x.id===$('#sp').value),q=num($('#sq').value),pr=num($('#spr').value),d=$('#sd').value||today();
+ if(!p||!(q>0)||!(pr>=0))return toast('Enter servings above 0 and a valid price.',1);
+ const need={};p.items.forEach(it=>{const g=ingBy(it.ing);if(g)need[g.id]=(need[g.id]||0)+toBase(g,it.q,it.u)*q});
+ const short=Object.entries(need).filter(([k,b])=>stock(ingBy(k))<b-1e-9).map(([k,b])=>{const g=ingBy(k);return`${g.name}: need ${fq(g,b)}, have ${fq(g,Math.max(stock(g),0))}`});
+ if(short.length&&!confirm('Not enough stock:\n'+short.join('\n')+'\n\nRecord the sale anyway? Only the stock you have will be deducted.'))return;
+ const sid=id('s'),use=[];Object.entries(need).forEach(([k,b])=>{const dd=Math.min(b,Math.max(stock(ingBy(k)),0));if(dd>0){D.txn.push({id:id('t'),ing:k,q:-dd,date:d,type:'sale',ref:sid,note:p.name+' x'+q});use.push([k,dd])}});
+ D.sale.push({id:sid,date:d,prod:p.id,name:p.name,qty:q,price:pr,cost:prodCost(p),use,void:0});save();toast('Sale recorded.');render()}
+function voidSale(i){const s=D.sale.find(x=>x.id===i);if(!s||s.void||!confirm(`Reverse the sale of ${s.qty} ${s.name}? Ingredients will be returned to stock.`))return;
+ s.void=1;s.use.forEach(([k,d])=>{if(ingBy(k))D.txn.push({id:id('t'),ing:k,q:d,date:today(),type:'reverse',ref:s.id,note:`Reversed ${s.name} x${s.qty}`})});save();toast('Sale reversed.');render()}
+
+/* ---- expenses ---- */
+function vExpenses(){const m={};D.exp.forEach(e=>m[pk(e.date,S.per)]=(m[pk(e.date,S.per)]||0)+e.amt);
+ return`<h2>Expenses</h2><p class=muted>Ingredient purchases are recorded under Stock, so they are not entered here (no double counting). Record packaging, transport, electricity, gas and other costs.</p><button class="btn pri" onclick="expForm()">+ Add expense</button><h3>Summary ${perSel()}</h3>`+tbl(['Period','Operating expenses'],Object.keys(m).sort().reverse().map(k=>[k,money(m[k])]))+`<p class=muted>Ingredient purchases (from Stock): ${money(tot().P)}</p><h3>All expenses</h3>`+tbl(['Date','Expense','Category','Amount',''],D.exp.slice().sort((a,b)=>a.date<b.date?1:-1).map(e=>[e.date,esc(e.name)+(e.note?`<br><small>${esc(e.note)}</small>`:''),esc(e.cat),money(e.amt),`<button class=btn onclick="expForm('${e.id}')">Edit</button> <button class="btn del" onclick="expDel('${e.id}')">Delete</button>`]))}
+function expForm(i){const e=i?D.exp.find(x=>x.id===i):null;form(e?'Edit expense':'Add expense',[{k:'name',l:'Expense name',v:e?.name},{k:'cat',l:'Category',t:'select',o:['Packaging','Transportation','Electricity','Gas','Other'],v:e?.cat},{k:'amt',l:'Amount (₱)',t:'number',v:e?.amt},{k:'date',l:'Date',t:'date',v:e?.date||today()},{k:'note',l:'Notes (optional)',v:e?.note}],v=>{
+  const a=num(v.amt);if(!v.name)return'Enter the expense name.';if(!(a>0))return'Enter an amount above 0.';const x={name:v.name,cat:v.cat,amt:a,date:v.date||today(),note:v.note};
+  if(e)Object.assign(e,x);else D.exp.push({id:id('e'),...x});save();render()})}
+function expDel(i){if(!confirm('Delete this expense?'))return;D.exp=D.exp.filter(e=>e.id!==i);save();render()}
+
+/* ---- finance ---- */
+function vFinance(){const t=tot(),st=[['Total sales',t.R],['Ingredient purchases',t.P],['Operating expenses',t.E],['Cost of goods sold',t.K],['Gross profit',t.G],['Net profit',t.N]];
+ return`<h2>Profit</h2><div class=grid>${st.map(([a,b])=>`<div class="card stat"><small>${a}</small><b>${money(b)}</b></div>`).join('')}</div><p class=muted>Gross profit = Sales − Cost of goods sold. Net profit = Gross profit − Operating expenses. Ingredients only count as a cost when they are used in recorded sales.</p><h3>Summary ${perSel()}</h3>`+tbl(['Period','Sales','Purchases','Cost of goods','Gross profit','Expenses','Net profit'],finRows().map(x=>[x[0],...x.slice(1).map(money)]))}
+
+/* ---- calculator ---- */
+function vCalculator(){const total=sum(C,ic);
+ return`<h2>Cost calculator</h2><div class=card><h3>Ingredient cost</h3>${D.ing.length?`<label>Ingredient<select id=ci onchange="ciCh()">${D.ing.map(g=>`<option value="${g.id}">${esc(g.name)}</option>`).join('')}</select></label><label>Quantity<input id=cq type=number step=any min=0></label><label>Unit<select id=cu></select></label><button class="btn pri" onclick="cAdd()">+ Add</button> <button class=btn onclick="C=[];render()">Clear</button>`:'<p class=muted>Add ingredients to use this.</p>'}`+tbl(['Ingredient','Qty','Cost'],C.map(it=>[esc(ingBy(it.ing)?.name),it.q+' '+it.u,money(ic(it))]).concat(C.length?[['<b>Total</b>','',`<b>${money(total)}</b>`]]:[]),'No ingredients added.')+`</div><div class=card><h3>Selling price calculator</h3><p class=muted>Try prices here. Saved products are not changed.</p><label>Start from a product (optional)<select onchange="loadP(this.value)"><option value="">—</option>${D.prod.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label><label>Production cost (₱)<input id=pc type=number step=any min=0 value="${total?r(total):''}" oninput="pcalc()"></label><label>Selling price (₱)<input id=pp type=number step=any min=0 oninput="pcalc()"></label><div id=po></div></div>`}
+function ciCh(){const g=ingBy($('#ci').value);$('#cu').innerHTML=unitsOf(g).map(u=>`<option>${u}</option>`).join('')}
+function cAdd(){const q=num($('#cq').value),g=ingBy($('#ci').value),u=$('#cu').value;if(!(q>0))return toast('Enter a quantity above 0.',1);if(isNaN(toBase(g,q,u)))return toast('That unit cannot be converted.',1);C.push({ing:g.id,q,u});render()}
+function loadP(i){const p=D.prod.find(x=>x.id===i);if(!p)return;$('#pc').value=r(prodCost(p));$('#pp').value=p.price;pcalc()}
+function pcalc(){const c=num($('#pc').value),p=num($('#pp').value);$('#po').innerHTML=isNaN(c)||isNaN(p)?'':`<p>Production cost: <b>${money(c)}</b><br>Selling price: <b>${money(p)}</b><br>Gross profit: <b>${money(p-c)}</b><br>Profit margin: <b>${p>0?((p-c)/p*100).toFixed(2):'0.00'}%</b></p>`}
+
+/* ---- reports ---- */
+const REP={
+inv:['Ingredient inventory',()=>[['Ingredient','Category','Remaining','Minimum','Unit cost','Stock value'],D.ing.map(g=>[g.name,g.cat,fq(g,stock(g)),fq(g,g.min),costTxt(g).replace(/<br>/g,' | '),r(Math.max(stock(g),0)*cpb(g))])]],
+buy:['Ingredient purchase history',()=>[['Date','Ingredient','Price','Quantity','Unit cost'],D.bat.slice().sort((a,b)=>a.date<b.date?1:-1).map(b=>{const g=ingBy(b.ing);return[b.date,g?g.name:'(deleted)',r(b.price),g?fq(g,b.qty):b.qty,r4(b.price/b.qty)]})]],
+cost:['Product costing',()=>[['Product','Selling price','Cost per serving','Profit per serving','Margin %'],D.prod.map(p=>{const c=prodCost(p);return[p.name,r(p.price),r(c),r(p.price-c),p.price?r((p.price-c)/p.price*100):0]})]],
+sales:['Sales',()=>[['Date','Product','Servings','Price each','Sales','Cost','Profit','Status'],D.sale.map(s=>[s.date,s.name,s.qty,r(s.price),r(rev(s)),r(cogs(s)),r(rev(s)-cogs(s)),s.void?'Reversed':'Active'])]],
+exp:['Expenses',()=>[['Date','Expense','Category','Amount','Notes'],D.exp.map(e=>[e.date,e.name,e.cat,r(e.amt),e.note||''])]],
+pl:['Profit and loss summary',()=>[['Period','Sales','Ingredient purchases','Cost of goods sold','Gross profit','Operating expenses','Net profit'],finRows().map(x=>[x[0],...x.slice(1).map(r)])]]};
+const r4=n=>+(+n).toFixed(4);
+function vReports(){const[h,rows]=REP[S.rep][1]();return`<h2>Reports</h2><label>Report<select onchange="S.rep=this.value;render()">${Object.entries(REP).map(([k,v])=>`<option value=${k}${S.rep===k?' selected':''}>${v[0]}</option>`).join('')}</select></label>${S.rep==='pl'?`<label>Period ${perSel()}</label>`:''}<button class="btn pri" onclick="expCsv()">Export CSV</button>`+tbl(h.map(esc),rows.map(x=>x.map(esc)))}
+const csv=(h,rows)=>'\ufeff'+[h,...rows].map(x=>x.map(c=>`"${String(c).replace(/"/g,'""')}"`).join(',')).join('\r\n');
+function dl(n,t,m){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:m}));a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1e3)}
+function expCsv(){const[h,rows]=REP[S.rep][1]();dl(`ricefully-${S.rep}-${today()}.csv`,csv(h,rows),'text/csv')}
+
+/* ---- backup ---- */
+function vData(){return`<h2>Backup</h2><div class=card warn><b>Your records live only in this browser.</b> Export a backup every week and keep it somewhere safe (for example, send it to yourself).</div><div class=card><p>Last backup: <b>${D.lastBackup?new Date(D.lastBackup).toLocaleString():'never'}</b></p><button class="btn pri" onclick="expAll()">Export all data (JSON)</button></div><div class=card><label>Import backup (JSON)<input type=file accept=".json,application/json" onchange="impAll(this)"></label></div><div class=card><p class=muted>Individual reports can be exported as CSV from Reports.</p>${IP?'<button class=btn onclick="IP.prompt()">Install app on this device</button>':''}<button class="btn del" onclick="clrAll()">Clear all data</button></div>`}
+function expAll(){D.lastBackup=new Date().toISOString();save();dl(`ricefully-backup-${today()}.json`,JSON.stringify(D,null,1),'application/json');toast('Backup exported.');render()}
+function impAll(el){const f=el.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);
+ if(!o||typeof o!=='object'||!['ing','bat','txn','prod','sale','exp'].every(k=>Array.isArray(o[k])))throw'Missing sections';
+ if(!['ing','bat','txn','prod','sale','exp'].every(k=>o[k].every(x=>x&&typeof x==='object'&&x.id)))throw'Records need IDs';
+ if(!confirm(`Replace ALL current records with this backup?\n${o.ing.length} ingredients, ${o.prod.length} products, ${o.sale.length} sales, ${o.exp.length} expenses.`)){el.value='';return}
+ D=Object.assign(empty(),o);save();render();toast('Backup imported.')}catch(e){toast('This file is not a valid Ricefully Yours backup.',1);el.value=''}};rd.readAsText(f)}
+function clrAll(){if(!confirm('Delete ALL records on this device? This cannot be undone.'))return;if(prompt('Type DELETE to confirm.')!=='DELETE')return toast('Nothing was deleted.');D=empty();save();render();toast('All data cleared.')}
+
+/* ---- home ---- */
+function vHome(){const t=tot(),out=D.ing.filter(g=>stock(g)<=0),low=D.ing.filter(g=>stock(g)>0&&stock(g)<=g.min),val=sum(D.ing,g=>Math.max(stock(g),0)*cpb(g));
+ const st=[['Ingredients',D.ing.length],['Inventory value',money(val)],['Low stock',low.length],['Out of stock',out.length],['Silog products',D.prod.length],['Total expenses',money(t.E)],['Total sales',money(t.R)],['Est. gross profit',money(t.G)],['Est. net profit',money(t.N)]];
+ const L=a=>a.length?'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p class=muted>None yet</p>',nm=i=>esc(ingBy(i)?.name||'(deleted)');
+ const bk=D.lastBackup?Math.floor((Date.now()-new Date(D.lastBackup))/864e5):null;
+ return`<h2>Overview</h2>`+(bk===null||bk>=7?`<div class="card warn">💾 ${bk===null?'No backup saved yet.':'Last backup was '+bk+' days ago.'} <a href="#data">Back up now</a></div>`:'')+(out.length+low.length?`<div class="card warn">⚠️ ${[...out.map(g=>g.name+' (out)'),...low.map(g=>g.name+' (low)')].map(esc).join(', ')}</div>`:'')+`<div class=grid>${st.map(([a,b])=>`<div class="card stat"><small>${a}</small><b>${b}</b></div>`).join('')}</div><h3>Recent activity</h3><div class=grid2><div class=card><h4>New ingredients</h4>${L(D.ing.slice(-5).reverse().map(g=>esc(g.name)))}</div><div class=card><h4>Inventory purchases</h4>${L(D.bat.slice(-5).reverse().map(b=>`${nm(b.ing)} · ${money(b.price)}`))}</div><div class=card><h4>Sales</h4>${L(act().slice(-5).reverse().map(s=>`${esc(s.name)} ×${s.qty} · ${money(rev(s))}`))}</div><div class=card><h4>Expenses</h4>${L(D.exp.slice(-5).reverse().map(e=>`${esc(e.name)} · ${money(e.amt)}`))}</div></div>`}
+
+/* ---- app shell ---- */
+const V={home:vHome,ingredients:vIngredients,stock:vStock,products:vProducts,sales:vSales,expenses:vExpenses,finance:vFinance,calculator:vCalculator,reports:vReports,data:vData};
+function render(){const h=(location.hash||'#home').slice(1),v=V[h]?h:'home';
+ $('#nav').innerHTML=N.map(([k,i,l])=>`<a href="#${k}" class="${k===v?'on':''}"><span>${i}</span>${l}</a>`).join('');
+ $('#app').innerHTML=V[v]();if($('#sp'))spCh();if($('#ci'))ciCh()}
+addEventListener('hashchange',()=>{scrollTo(0,0);render()});
+addEventListener('beforeinstallprompt',e=>{e.preventDefault();IP=e;if(location.hash==='#data')render()});
+load();render();
+if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script></body></html>
