@@ -2,47 +2,85 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Ricefully Yours</title>
-<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg">
-<meta name="theme-color" content="#E8A317">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#6B4630">
 <style>
-:root{--cream:#FFF4DC;--rice:#FFFCF5;--gold:#E8A317;--brown:#6B4A2B;--ink:#3A2814;--line:#EBDDBF;--ok:#4F7F35;--bad:#B23B2B}
+:root{--bg:#F3EADC;--paper:#FCF8F0;--cream:#FAF1E2;--brown:#6B4630;--deep:#46291A;--gold:#D4A03C;--gold2:#F3DFAE;--line:#E3D2BA;--ink:#3B2515;--muted:#76594A;--ok:#4B7A33;--bad:#A9372A;--serif:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;--sans:"Avenir Next","Segoe UI","Helvetica Neue",system-ui,sans-serif;--sh:0 10px 26px -12px rgba(70,41,26,.35)}
 *{box-sizing:border-box}
-body{margin:0;font:16px/1.45 "Trebuchet MS","Segoe UI",system-ui,sans-serif;background:var(--cream);color:var(--ink)}
-header{position:fixed;top:0;left:0;right:0;height:56px;background:var(--rice);border-bottom:3px solid var(--gold);display:flex;align-items:baseline;gap:10px;padding:10px 14px;z-index:5}
-header b{font-size:19px;color:var(--brown)}header small{color:#8a6c49}
-#nav{position:fixed;z-index:5;background:var(--rice);display:flex;bottom:0;left:0;right:0;overflow-x:auto;border-top:1px solid var(--line)}
-#nav a{flex:0 0 auto;min-width:70px;text-align:center;padding:6px 4px;font-size:11px;color:var(--brown);text-decoration:none}
-#nav a span{display:block;font-size:20px}
-#nav a.on{background:var(--gold);color:var(--ink);font-weight:700}
-main{padding:72px 14px 92px;max-width:1000px}
-h2{margin:6px 0 12px;color:var(--brown)}h3,h4{margin:10px 0 6px;color:var(--brown)}
-@media(min-width:800px){#nav{top:56px;bottom:0;right:auto;width:190px;flex-direction:column;border-top:0;border-right:1px solid var(--line)}#nav a{text-align:left;padding:13px 16px;font-size:15px;display:flex;gap:10px;align-items:center}#nav a span{display:inline;font-size:18px}main{margin-left:190px;padding-bottom:30px}}
-.card{background:var(--rice);border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:10px 0}
-.card.warn{background:#FFE9B8;border-color:var(--gold)}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:10px}
-.stat small{color:#8a6c49}.stat b{display:block;font-size:20px}
-.btn{min-height:44px;padding:8px 14px;border-radius:10px;border:1px solid var(--brown);background:var(--rice);color:var(--brown);font:inherit;font-weight:700;cursor:pointer;margin:2px 0}
-.btn.pri{background:var(--gold);border-color:var(--gold);color:var(--ink)}.btn.del{color:var(--bad);border-color:var(--bad)}
-.btn:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:3px solid var(--brown);outline-offset:1px}
-.tw{overflow-x:auto;margin:8px 0}table{border-collapse:collapse;width:100%;font-size:14px;background:var(--rice)}
-th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#F6E6BE;color:var(--brown);white-space:nowrap}
-label{display:block;margin:9px 0;font-size:14px;color:var(--brown)}
-input,select,textarea{width:100%;padding:11px;font:inherit;color:var(--ink);border:1px solid var(--line);border-radius:8px;background:#fff;margin-top:3px}
+html{scroll-behavior:smooth}
+body{margin:0;font:16px/1.5 var(--sans);color:var(--ink);background:radial-gradient(900px 420px at 90% -5%,#FFF6E2 0,transparent 65%),var(--bg);min-height:100vh}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cg fill='%236B4630' opacity='.07'%3E%3Cellipse cx='22' cy='30' rx='6' ry='2.6' transform='rotate(-30 22 30)'/%3E%3Cellipse cx='92' cy='18' rx='6' ry='2.6' transform='rotate(25 92 18)'/%3E%3Cellipse cx='60' cy='78' rx='6' ry='2.6' transform='rotate(-10 60 78)'/%3E%3Cellipse cx='120' cy='96' rx='6' ry='2.6' transform='rotate(40 120 96)'/%3E%3Cellipse cx='24' cy='118' rx='6' ry='2.6' transform='rotate(15 24 118)'/%3E%3C/g%3E%3C/svg%3E")}
+::selection{background:var(--gold2)}
+header{position:fixed;top:0;left:0;right:0;height:64px;background:rgba(252,248,240,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);box-shadow:0 2px 0 var(--gold),0 6px 18px -10px rgba(70,41,26,.3);display:flex;align-items:center;gap:12px;padding:0 16px;z-index:6}
+.mark{width:44px;height:44px;border-radius:50%;box-shadow:0 2px 8px rgba(70,41,26,.3);transition:transform .35s}
+header:hover .mark{transform:rotate(-8deg) scale(1.05)}
+.brand b{display:block;font:italic 700 22px/1.1 var(--serif);color:var(--deep)}
+.brand small{display:block;color:var(--muted);font-size:12px;letter-spacing:.05em}
+#nav{position:fixed;z-index:5;background:var(--paper);display:flex;bottom:0;left:0;right:0;overflow-x:auto;border-top:1px solid var(--line);box-shadow:0 -8px 20px -14px rgba(70,41,26,.4);padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+#nav a{flex:0 0 auto;min-width:74px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 4px;font-size:11px;color:var(--muted);text-decoration:none;border-radius:12px;transition:color .2s,background .2s}
+#nav a:hover{color:var(--deep)}
+.ic{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;transition:transform .2s,background .2s}
+#nav a:hover .ic{transform:translateY(-2px) scale(1.08)}
+#nav a.on{color:var(--deep);font-weight:700}#nav a.on .ic{background:var(--gold2);padding:4px;box-sizing:content-box;border-radius:10px;margin:-4px 0}
+.nf{display:none}
+main{padding:84px 16px 98px;max-width:1000px;position:relative}
+.enter{animation:rise .4s ease both}@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+h2{font:italic 700 29px/1.2 var(--serif);color:var(--deep);margin:6px 0 14px}
+h2::after{content:"";display:block;width:56px;height:6px;margin-top:8px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='6'%3E%3Cpath d='M1 3Q8 0 15 3T29 3T43 3T55 3' fill='none' stroke='%23D4A03C' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat}
+h3{font:700 19px/1.3 var(--serif);color:var(--brown);margin:14px 0 6px}h4{font-size:15px;color:var(--brown);margin:8px 0 4px}
+a{color:var(--brown);font-weight:700}
+@media(min-width:800px){
+#nav{top:64px;bottom:0;right:auto;width:224px;flex-direction:column;border-top:0;border-right:1px solid var(--line);box-shadow:none;padding:14px 10px;overflow:auto}
+#nav a{flex-direction:row;gap:12px;padding:11px 14px;font-size:15px;margin:1px 0;min-width:0}
+#nav a:hover{background:var(--gold2)}#nav a:hover .ic{transform:translateX(2px) scale(1.08)}
+#nav a.on{background:var(--brown);color:var(--cream);box-shadow:inset 4px 0 0 var(--gold)}#nav a.on .ic{background:none;padding:0;margin:0}
+.nf{display:block;margin-top:auto;padding:14px 8px 6px;text-align:center;font:italic 14px var(--serif);color:var(--muted);border-top:1px dashed var(--line)}
+main{margin-left:224px;padding-bottom:36px}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0;box-shadow:0 1px 2px rgba(70,41,26,.06);transition:box-shadow .25s,border-color .25s}
+.card:hover{box-shadow:var(--sh);border-color:#D9C29B}
+.card.warn{background:linear-gradient(90deg,#FBE9BD,#FFF3D6);border-color:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px}.grid .card{margin:0}.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}.grid2 .card{margin:0}
+.stat{border-left:4px solid var(--gold);transition:transform .25s,box-shadow .25s}.stat:hover{transform:translateY(-3px)}
+.stat small{color:var(--muted);font-size:13px}.stat b{display:block;font:700 25px/1.2 var(--serif);color:var(--deep)}
+.stat.hl{background:linear-gradient(135deg,var(--brown),var(--deep));border-color:var(--gold)}.stat.hl small{color:var(--gold2)}.stat.hl b{color:var(--cream)}
+.hero{position:relative;overflow:hidden;display:flex;justify-content:space-between;align-items:center;gap:16px;border-radius:24px;padding:24px;margin:4px 0 16px;color:var(--cream);background:radial-gradient(420px 220px at 15% 130%,rgba(212,160,60,.35),transparent 70%),linear-gradient(135deg,var(--brown),var(--deep));box-shadow:var(--sh)}
+.hero .hi{margin:0;color:var(--gold2);font-size:14px;letter-spacing:.05em}
+.hero h2{color:var(--cream);margin:2px 0 12px;font-size:25px}.hero h2::after{display:none}
+.hs{display:flex;gap:26px;flex-wrap:wrap}.hs small{display:block;color:var(--gold2);opacity:.85;font-size:13px}.hs b{font:700 26px var(--serif)}
+.wm{width:clamp(84px,18vw,150px);aspect-ratio:1;border-radius:50%;box-shadow:0 10px 28px rgba(0,0,0,.4);transition:transform .5s;flex:none}
+.hero:hover .wm{transform:rotate(-6deg) scale(1.05)}
+.btn{min-height:44px;padding:8px 16px;border-radius:12px;border:1.5px solid var(--brown);background:transparent;color:var(--brown);font:700 15px var(--sans);cursor:pointer;margin:2px 0;transition:background .2s,transform .15s,box-shadow .2s,filter .2s}
+.btn:hover{background:var(--gold2);transform:translateY(-1px);box-shadow:0 6px 14px -8px rgba(70,41,26,.5)}.btn:active{transform:none;box-shadow:none}
+.btn.pri{background:linear-gradient(180deg,#E6B754,var(--gold));border-color:#C08F2B;color:var(--deep)}.btn.pri:hover{filter:brightness(1.06)}
+.btn.del{color:var(--bad);border-color:#D9A8A0}.btn.del:hover{background:#F8E1DD}
+a:focus-visible,.btn:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
+.tw{overflow-x:auto;margin:10px 0;border:1px solid var(--line);border-radius:14px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:14px}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#F1E4CB;color:var(--brown);white-space:nowrap;font-size:13px}
+tr:last-child td{border-bottom:0}td{transition:background .15s}tr:hover td{background:#FFF7E4}
+label{display:block;margin:10px 0;font-size:14px;font-weight:600;color:var(--brown)}
+input,select,textarea{width:100%;padding:11px 12px;font:inherit;font-weight:400;color:var(--ink);border:1.5px solid var(--line);border-radius:10px;background:#fff;margin-top:4px;transition:border-color .2s,box-shadow .2s}
+input:hover,select:hover{border-color:#CDB48C}input:focus,select:focus,textarea:focus{outline:0;border-color:var(--gold);box-shadow:0 0 0 4px rgba(212,160,60,.28)}
 .rr{display:grid;grid-template-columns:1fr 72px 78px 44px;gap:4px;margin:4px 0}.rr *{margin:0}
-.b{padding:2px 8px;border-radius:99px;font-size:12px;font-weight:700}.ok{background:#DDEBC9;color:var(--ok)}.warn.b{background:#FFE08A}.bad{background:#F6D3CC;color:var(--bad)}
-.sp{display:flex;justify-content:space-between;gap:8px}.row{display:flex;gap:8px;justify-content:flex-end;margin-top:12px}.muted{color:#8a6c49}.err{color:var(--bad);font-weight:700}
+.b{padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;white-space:nowrap}.ok{background:#DCEBCB;color:var(--ok)}.warn.b{background:#FBE3A0;color:#7A5410}.bad{background:#F6D5CF;color:var(--bad)}
+.sp{display:flex;justify-content:space-between;gap:8px;align-items:baseline}.sp b:first-child{font:700 19px var(--serif);color:var(--deep)}
+.row{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}.muted{color:var(--muted)}.err{color:var(--bad);font-weight:700}
 .void td{text-decoration:line-through;color:#9a8a77}
-dialog{border:0;border-radius:14px;max-width:540px;width:94%;background:var(--rice);color:var(--ink);padding:18px;max-height:92vh}dialog::backdrop{background:#3a281488}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--brown);color:#fff;padding:10px 16px;border-radius:10px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90%}
-#toast.show{opacity:1}#toast.bad{background:var(--bad)}
+.empty{text-align:center;padding:26px 10px;color:var(--muted)}.empty img{width:64px;height:64px;border-radius:50%;opacity:.55;filter:sepia(.3)}.empty p{margin:8px 0 0}
+dialog{border:0;border-top:5px solid var(--gold);border-radius:20px;max-width:540px;width:94%;background:var(--paper);color:var(--ink);padding:20px;max-height:92vh;box-shadow:0 30px 60px -20px rgba(70,41,26,.55)}
+dialog[open]{animation:pop .22s ease}@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+dialog::backdrop{background:rgba(59,37,21,.5);backdrop-filter:blur(2px)}
+#toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,12px);background:var(--deep);color:var(--cream);padding:11px 18px;border-radius:12px;box-shadow:var(--sh);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;z-index:20;max-width:90%;border-left:4px solid var(--gold)}
+#toast.show{opacity:1;transform:translate(-50%,0)}#toast.bad{background:var(--bad)}
 ul{padding-left:18px;margin:4px 0}
+@media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
 </style></head><body>
-<header><b>🍚 Ricefully Yours</b><small>Silog Meals on the Go</small></header>
+<header><img class=mark src="logo.png" alt="Ricefully Yours logo"><div class=brand><b>Ricefully Yours</b><small>Silog Meals on the Go</small></div></header>
 <nav id="nav"></nav><main id="app"></main><dialog id="dlg"></dialog><div id="toast"></div>
 <script>
 const KEY='ricefully_v1',$=s=>document.querySelector(s),dlg=$('#dlg');
 const U={kg:['w',1000],g:['w',1],L:['v',1000],mL:['v',1],pcs:['c',1],dozen:['c',12]};
-const N=[['home','🏠','Home'],['ingredients','🥚','Ingredients'],['stock','📦','Stock'],['products','🍳','Products'],['sales','🧾','Sales'],['expenses','💸','Expenses'],['finance','📈','Profit'],['calculator','🧮','Calculator'],['reports','📋','Reports'],['data','💾','Backup']];
+const N=[['home','Home'],['ingredients','Ingredients'],['stock','Stock'],['products','Products'],['sales','Sales'],['expenses','Expenses'],['finance','Profit'],['calculator','Calculator'],['reports','Reports'],['data','Backup']],IC={"home": "M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z", "ingredients": "M12 3c4 0 7 6 7 11a7 7 0 0 1-14 0c0-5 3-11 7-11z", "stock": "M21 8l-9-5-9 5v8l9 5 9-5zM3 8l9 5 9-5M12 13v8", "products": "M3 12h18a9 9 0 0 1-18 0zM8 8c0-2 2-2 2-4M13 8c0-2 2-2 2-4", "sales": "M6 3h12v18l-3-2-3 2-3-2-3 2zM9 8h6M9 12h6", "expenses": "M3 7h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 7l2-3h12M16 14h2", "finance": "M3 17l6-6 4 4 8-8M15 7h6v6", "calculator": "M6 3h12a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zM8 7h8M8 12h2M12 12h2M16 12h.01M8 16h2M12 16h2M16 16h.01", "reports": "M9 3h6v3H9zM6 5H5v16h14V5h-1M9 11h6M9 15h6", "data": "M12 4c4.4 0 8 1.1 8 2.5S16.4 9 12 9 4 7.9 4 6.5 7.6 4 12 4zM4 6.5v5C4 12.9 7.6 14 12 14s8-1.1 8-2.5v-5M4 11.5v5C4 17.9 7.6 19 12 19s8-1.1 8-2.5v-5"};
 const empty=()=>({ing:[],bat:[],txn:[],prod:[],sale:[],exp:[],lastBackup:null});
 let D,S={per:'day',rep:'inv'},C=[],RR=[],IP=null;
 function load(){try{D=Object.assign(empty(),JSON.parse(localStorage.getItem(KEY)))}catch(e){D=empty()}}
@@ -54,7 +92,7 @@ const money=n=>'₱'+(+n||0).toLocaleString('en-PH',{minimumFractionDigits:2,max
 const money4=n=>'₱'+(+n||0).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:4});
 const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOString().slice(0,10);
 function toast(m,bad){const t=$('#toast');t.textContent=m;t.className='show'+(bad?' bad':'');clearTimeout(toast.t);toast.t=setTimeout(()=>t.className='',3200)}
-const tbl=(h,rows,e='Nothing here yet.')=>rows.length?`<div class=tw><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(x=>`<tr${x.cls?` class=${x.cls}`:''}>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`:`<p class=muted>${e}</p>`;
+const tbl=(h,rows,e='Nothing here yet.')=>rows.length?`<div class=tw><table><tr>${h.map(x=>`<th>${x}</th>`).join('')}</tr>${rows.map(x=>`<tr${x.cls?` class=${x.cls}`:''}>${x.map(c=>`<td>${c}</td>`).join('')}</tr>`).join('')}</table></div>`:`<div class=empty><img src=logo.png alt=""><p>${e}</p></div>`;
 
 /* ---- core calculations ---- */
 const ingBy=i=>D.ing.find(x=>x.id===i);
@@ -158,7 +196,7 @@ function expDel(i){if(!confirm('Delete this expense?'))return;D.exp=D.exp.filter
 
 /* ---- finance ---- */
 function vFinance(){const t=tot(),st=[['Total sales',t.R],['Ingredient purchases',t.P],['Operating expenses',t.E],['Cost of goods sold',t.K],['Gross profit',t.G],['Net profit',t.N]];
- return`<h2>Profit</h2><div class=grid>${st.map(([a,b])=>`<div class="card stat"><small>${a}</small><b>${money(b)}</b></div>`).join('')}</div><p class=muted>Gross profit = Sales − Cost of goods sold. Net profit = Gross profit − Operating expenses. Ingredients only count as a cost when they are used in recorded sales.</p><h3>Summary ${perSel()}</h3>`+tbl(['Period','Sales','Purchases','Cost of goods','Gross profit','Expenses','Net profit'],finRows().map(x=>[x[0],...x.slice(1).map(money)]))}
+ return`<h2>Profit</h2><div class=grid>${st.map(([a,b],i)=>`<div class="card stat"><small>${a}</small><b>${money(b)}</b></div>`).join('')}</div><p class=muted>Gross profit = Sales − Cost of goods sold. Net profit = Gross profit − Operating expenses. Ingredients only count as a cost when they are used in recorded sales.</p><h3>Summary ${perSel()}</h3>`+tbl(['Period','Sales','Purchases','Cost of goods','Gross profit','Expenses','Net profit'],finRows().map(x=>[x[0],...x.slice(1).map(money)]))}
 
 /* ---- calculator ---- */
 function vCalculator(){const total=sum(C,ic);
@@ -183,7 +221,7 @@ function dl(n,t,m){const a=document.createElement('a');a.href=URL.createObjectUR
 function expCsv(){const[h,rows]=REP[S.rep][1]();dl(`ricefully-${S.rep}-${today()}.csv`,csv(h,rows),'text/csv')}
 
 /* ---- backup ---- */
-function vData(){return`<h2>Backup</h2><div class=card warn><b>Your records live only in this browser.</b> Export a backup every week and keep it somewhere safe (for example, send it to yourself).</div><div class=card><p>Last backup: <b>${D.lastBackup?new Date(D.lastBackup).toLocaleString():'never'}</b></p><button class="btn pri" onclick="expAll()">Export all data (JSON)</button></div><div class=card><label>Import backup (JSON)<input type=file accept=".json,application/json" onchange="impAll(this)"></label></div><div class=card><p class=muted>Individual reports can be exported as CSV from Reports.</p>${IP?'<button class=btn onclick="IP.prompt()">Install app on this device</button>':''}<button class="btn del" onclick="clrAll()">Clear all data</button></div>`}
+function vData(){return`<h2>Backup</h2><div class="card warn"><b>Your records live only in this browser.</b> Export a backup every week and keep it somewhere safe (for example, send it to yourself).</div><div class=card><p>Last backup: <b>${D.lastBackup?new Date(D.lastBackup).toLocaleString():'never'}</b></p><button class="btn pri" onclick="expAll()">Export all data (JSON)</button></div><div class=card><label>Import backup (JSON)<input type=file accept=".json,application/json" onchange="impAll(this)"></label></div><div class=card><p class=muted>Individual reports can be exported as CSV from Reports.</p>${IP?'<button class=btn onclick="IP.prompt()">Install app on this device</button>':''}<button class="btn del" onclick="clrAll()">Clear all data</button></div>`}
 function expAll(){D.lastBackup=new Date().toISOString();save();dl(`ricefully-backup-${today()}.json`,JSON.stringify(D,null,1),'application/json');toast('Backup exported.');render()}
 function impAll(el){const f=el.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const o=JSON.parse(rd.result);
  if(!o||typeof o!=='object'||!['ing','bat','txn','prod','sale','exp'].every(k=>Array.isArray(o[k])))throw'Missing sections';
@@ -197,15 +235,18 @@ function vHome(){const t=tot(),out=D.ing.filter(g=>stock(g)<=0),low=D.ing.filter
  const st=[['Ingredients',D.ing.length],['Inventory value',money(val)],['Low stock',low.length],['Out of stock',out.length],['Silog products',D.prod.length],['Total expenses',money(t.E)],['Total sales',money(t.R)],['Est. gross profit',money(t.G)],['Est. net profit',money(t.N)]];
  const L=a=>a.length?'<ul>'+a.map(x=>'<li>'+x+'</li>').join('')+'</ul>':'<p class=muted>None yet</p>',nm=i=>esc(ingBy(i)?.name||'(deleted)');
  const bk=D.lastBackup?Math.floor((Date.now()-new Date(D.lastBackup))/864e5):null;
- return`<h2>Overview</h2>`+(bk===null||bk>=7?`<div class="card warn">💾 ${bk===null?'No backup saved yet.':'Last backup was '+bk+' days ago.'} <a href="#data">Back up now</a></div>`:'')+(out.length+low.length?`<div class="card warn">⚠️ ${[...out.map(g=>g.name+' (out)'),...low.map(g=>g.name+' (low)')].map(esc).join(', ')}</div>`:'')+`<div class=grid>${st.map(([a,b])=>`<div class="card stat"><small>${a}</small><b>${b}</b></div>`).join('')}</div><h3>Recent activity</h3><div class=grid2><div class=card><h4>New ingredients</h4>${L(D.ing.slice(-5).reverse().map(g=>esc(g.name)))}</div><div class=card><h4>Inventory purchases</h4>${L(D.bat.slice(-5).reverse().map(b=>`${nm(b.ing)} · ${money(b.price)}`))}</div><div class=card><h4>Sales</h4>${L(act().slice(-5).reverse().map(s=>`${esc(s.name)} ×${s.qty} · ${money(rev(s))}`))}</div><div class=card><h4>Expenses</h4>${L(D.exp.slice(-5).reverse().map(e=>`${esc(e.name)} · ${money(e.amt)}`))}</div></div>`}
+ const hr=new Date().getHours(),td=today(),ts=act().filter(x=>x.date===td);
+ const hero=`<section class=hero><div><p class=hi>${hr<12?'Good morning':hr<18?'Good afternoon':'Good evening'}!</p><h2>Made for your hungry heart</h2><div class=hs><div><small>Today's sales</small><b>${money(sum(ts,rev))}</b></div><div><small>Today's profit</small><b>${money(sum(ts,x=>rev(x)-cogs(x)))}</b></div></div></div><img class=wm src=logo.png alt=""></section>`;
+ return hero+(bk===null||bk>=7?`<div class="card warn">💾 ${bk===null?'No backup saved yet.':'Last backup was '+bk+' days ago.'} <a href="#data">Back up now</a></div>`:'')+(out.length+low.length?`<div class="card warn">⚠️ ${[...out.map(g=>g.name+' (out)'),...low.map(g=>g.name+' (low)')].map(esc).join(', ')}</div>`:'')+`<div class=grid>${st.map(([a,b],i)=>`<div class="card stat${i===st.length-1?' hl':''}"><small>${a}</small><b>${b}</b></div>`).join('')}</div><h3>Recent activity</h3><div class=grid2><div class=card><h4>New ingredients</h4>${L(D.ing.slice(-5).reverse().map(g=>esc(g.name)))}</div><div class=card><h4>Inventory purchases</h4>${L(D.bat.slice(-5).reverse().map(b=>`${nm(b.ing)} · ${money(b.price)}`))}</div><div class=card><h4>Sales</h4>${L(act().slice(-5).reverse().map(s=>`${esc(s.name)} ×${s.qty} · ${money(rev(s))}`))}</div><div class=card><h4>Expenses</h4>${L(D.exp.slice(-5).reverse().map(e=>`${esc(e.name)} · ${money(e.amt)}`))}</div></div>`}
 
 /* ---- app shell ---- */
 const V={home:vHome,ingredients:vIngredients,stock:vStock,products:vProducts,sales:vSales,expenses:vExpenses,finance:vFinance,calculator:vCalculator,reports:vReports,data:vData};
 function render(){const h=(location.hash||'#home').slice(1),v=V[h]?h:'home';
- $('#nav').innerHTML=N.map(([k,i,l])=>`<a href="#${k}" class="${k===v?'on':''}"><span>${i}</span>${l}</a>`).join('');
+ $('#nav').innerHTML=N.map(([k,l])=>`<a href="#${k}" class="${k===v?'on':''}"><svg class=ic viewBox="0 0 24 24" aria-hidden=true><path d="${IC[k]}"/></svg>${l}</a>`).join('')+'<div class=nf>Made for your hungry heart ♡</div>';
  $('#app').innerHTML=V[v]();if($('#sp'))spCh();if($('#ci'))ciCh()}
-addEventListener('hashchange',()=>{scrollTo(0,0);render()});
+const enter=()=>{const a=$('#app');a.classList.remove('enter');void a.offsetWidth;a.classList.add('enter')};
+addEventListener('hashchange',()=>{scrollTo(0,0);render();enter()});
 addEventListener('beforeinstallprompt',e=>{e.preventDefault();IP=e;if(location.hash==='#data')render()});
-load();render();
+load();render();enter();
 if('serviceWorker'in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 </script></body></html>
